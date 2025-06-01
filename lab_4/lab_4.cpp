@@ -2,6 +2,8 @@
 #include <vector>
 #include <unordered_map>
 #include <algorithm>
+#include <utility> 
+
 using namespace std;
 
 // знайти дві різні вершини в кореневому дереві, що мають один колір і жодна з них не є предком іншої
@@ -48,7 +50,9 @@ int main() {
         groups[color[i]].push_back(i);
     }
 
-    for (auto& [col, nodes] : groups) {
+    for (auto& pair_col_nodes : groups) { 
+        vector<int>& nodes = pair_col_nodes.second; 
+
         if (nodes.size() < 2) continue;
 
         sort(nodes.begin(), nodes.end(), [](int a, int b) {
@@ -56,10 +60,12 @@ int main() {
             });
 
         for (int i = 0; i + 1 < (int)nodes.size(); ++i) {
-            int u = nodes[i], v = nodes[i + 1];
+            int u = nodes[i];
+            int v = nodes[i + 1];
+
             if (!isAncestor(u, v) && !isAncestor(v, u)) {
                 cout << "yes\n" << u << " " << v << "\n";
-                return 0;
+                return 0; 
             }
         }
     }
