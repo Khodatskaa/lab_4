@@ -8,8 +8,6 @@
 #include <limits>
 using namespace std;
 
-// Потрібно визначити, чи можна дістатися з однієї станції до іншої, прокладаючи нові рейки не довші за $k$, і якщо так — за яку мінімальну кількість днів.
-
 const int INF = numeric_limits<int>::max();
 
 struct Station {
@@ -17,6 +15,7 @@ struct Station {
     int x, y;
 };
 
+// Функція для обчислення квадрата евклідової відстані між двома станціями
 int distance_squared(const Station& a, const Station& b) {
     int dx = a.x - b.x;
     int dy = a.y - b.y;
@@ -32,6 +31,8 @@ int main() {
 
     map<string, int> name_to_id;
     vector<Station> stations(n);
+
+    // Зчитування станцій та збереження їх ідентифікаторів
     for (int i = 0; i < n; ++i) {
         cin >> stations[i].name >> stations[i].x >> stations[i].y;
         name_to_id[stations[i].name] = i;
@@ -39,6 +40,7 @@ int main() {
 
     vector<vector<pair<int, int>>> graph(n);
 
+    // Додаємо наявні залізничні сполучення (вага 0)
     for (int i = 0; i < m; ++i) {
         string u, v;
         cin >> u >> v;
@@ -49,23 +51,35 @@ int main() {
     }
 
     int k2 = k * k;
-    for (int i = 0; i < n; ++i)
-        for (int j = i + 1; j < n; ++j)
+
+    // Додаємо потенційні нові сполучення (вага 1)
+    for (int i = 0; i < n; ++i) {
+        for (int j = i + 1; j < n; ++j) {
             if (distance_squared(stations[i], stations[j]) <= k2) {
                 graph[i].push_back({ j, 1 });
                 graph[j].push_back({ i, 1 });
             }
+        }
+    }
 
-    int start = name_to_id[s1], goal = name_to_id[s2];
+    int start = name_to_id[s1];
+    int goal = name_to_id[s2];
+
     vector<int> dist(n, INF);
     deque<int> dq;
-    dq.push_back(start);
-    dist[start] = 0;
 
+    dist[start] = 0;
+    dq.push_back(start);
+
+    // Алгоритм BFS 0-1
     while (!dq.empty()) {
         int u = dq.front();
         dq.pop_front();
-        for (auto [v, w] : graph[u]) {
+
+        for (size_t i = 0; i < graph[u].size(); ++i) {
+            int v = graph[u][i].first;
+            int w = graph[u][i].second;
+
             if (dist[u] + w < dist[v]) {
                 dist[v] = dist[u] + w;
                 if (w == 0)
