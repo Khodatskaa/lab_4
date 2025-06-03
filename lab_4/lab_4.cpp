@@ -20,10 +20,15 @@ void dijkstra(int start, int n) {
     pq.push({ 0, start });
 
     while (!pq.empty()) {
-        auto [d, u] = pq.top(); pq.pop();
+        long long d = pq.top().first;
+        int u = pq.top().second;
+        pq.pop();
         if (d > dist[u]) continue;
 
-        for (auto [v, w] : graph[u]) {
+        for (const auto& edge : graph[u]) {
+            int v = edge.first;
+            int w = edge.second;
+
             if (dist[u] + w < dist[v]) {
                 dist[v] = dist[u] + w;
                 pq.push({ dist[v], v });
